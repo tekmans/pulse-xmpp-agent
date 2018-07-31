@@ -50,7 +50,7 @@ from lib.utils import   DEBUGPULSE, getIpXmppInterface, refreshfingerprint,\
                         protoandport, createfingerprintnetwork, isWinUserAdmin,\
                         isMacOsUserAdmin, check_exist_ip_port, ipfromdns,\
                         shutdown_command, reboot_command, vnc_set_permission,\
-                        save_count_start
+                        save_count_start, isBase64
 from lib.manage_xmppbrowsing import xmppbrowsing
 from lib.manage_event import manage_event
 from lib.manage_process import mannageprocess, process_on_end_send_message_xmpp
@@ -216,7 +216,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
     def handle_client_connection(self, client_socket):
         """
-        this function handles the message received from kiosk
+        this function handles the message received from kiosk or watching syncting service
         the function must provide a response to an acknowledgment kiosk or a result
         Args:
             client_socket: socket for exchanges between AM and Kiosk
@@ -226,7 +226,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         """
         try:
             # request the recv message
-            recv_msg_from_kiosk = client_socket.recv(1024)
+            recv_msg_from_kiosk = client_socket.recv(4096)
             if len(recv_msg_from_kiosk) != 0:
                 print 'Received {}'.format(recv_msg_from_kiosk)
                 datasend = { 'action' : "resultkiosk",
@@ -235,7 +235,14 @@ class MUCBot(sleekxmpp.ClientXMPP):
                             "base64" : False,
                             'data': {}}
                 msg = str(recv_msg_from_kiosk.decode("utf-8", 'ignore'))
-                result = json.loads(msg)
+                ##############
+                if isBase64(msg):
+                    msg = base64.b64decode(msg)
+                try:
+                    result = json.loads(msg)
+                except ValueError as e:
+                    logger.error('Message socket is not json correct : %s'%(str(e)))
+                    return
                 if 'uuid' in result:
                     datasend['data']['uuid'] = result['uuid']
 
@@ -274,11 +281,17 @@ class MUCBot(sleekxmpp.ClientXMPP):
                                     logging.getLogger().info(result['message'])
                                 elif result['type'] == "warning":
                                     logging.getLogger().warning(result['message'])
+                    elif result['action'] == "notifysyncthing":
+                        datasend['action'] = "notifysyncthing"
+                        datasend['sessionid'] = getRandomName(6, "syncthing")
+                        datasend['data'] = result['data']
+                    else:
+                        #bad action
+                        logging.getLogger().warning("this action is not taken into account : %s"%result['action'])
+                        return
+                    #call plugin on master
                     self.send_message_to_master(datasend)
 
-            ### Received {'uuid': 45d4-3124c21-3123, 'action': 'kioskinterfaceInstall', 'subaction': 'Install'}
-            # send result or acquit
-            ###client_socket.send(recv_msg_from_kiosk)
         finally:
             client_socket.close()
 
