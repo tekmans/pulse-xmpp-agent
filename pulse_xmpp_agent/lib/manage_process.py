@@ -29,7 +29,7 @@ import logging
 import subprocess
 from threading import Timer
 logger = logging.getLogger()
-from utils import decode_strconsole, encode_strconsole
+from utils import decode_strconsole
 
 def processcommand(command , queue_out_session, messagestr, timeout):
     logging.error("########processcommand")
@@ -114,13 +114,11 @@ def processstepcommand ( command , queue_out_session, messagestr, timeout, step)
                     nb = t.split("@")
                     nb1 = -int(nb[0])
                     logging.getLogger().debug( "=======lastlines============%s========"%nb1)
-                    tab = result[nb1:]
                     workingstep[t] = os.linesep.join(result)
                 elif t.endswith('firstlines'):
                     nb = t.split("@")
                     nb1 = int(nb[0])
                     logging.getLogger().debug( "=======firstlines============%s======="%nb1)
-                    tab = result[:nb1]
                     workingstep[t] = os.linesep.join(result)
             if 'goto' in workingstep:
                 message['data']['stepcurrent'] = workingstep['goto']

@@ -28,11 +28,6 @@ import json
 import logging
 from utils import shellcommandtimeout, file_put_contents, file_get_contents, decode_strconsole, encode_strconsole
 from  agentconffile import  directoryconffile
-from shutil import copyfile
-import datetime
-import zlib
-import re
-import base64
 #from utils_psutil import sensors_battery,\
                          #winservices,\
                          #clone_ps_aux,\

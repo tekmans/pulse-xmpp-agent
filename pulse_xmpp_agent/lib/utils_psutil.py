@@ -23,10 +23,9 @@
 """
 function for monitoring
 """
-import sys, os
+import os
 import psutil
 import datetime, time
-import collections
 import socket
 from socket import AF_INET, SOCK_STREAM, SOCK_DGRAM
 
@@ -291,24 +290,6 @@ duplex_map = {
     psutil.NIC_DUPLEX_HALF: "half",
     psutil.NIC_DUPLEX_UNKNOWN: "?",
 }
-
-
-def bytes2human(n):
-    """
-    >>> bytes2human(10000)
-    '9.8 K'
-    >>> bytes2human(100001221)
-    '95.4 M'
-    """
-    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
-    prefix = {}
-    for i, s in enumerate(symbols):
-        prefix[s] = 1 << (i + 1) * 10
-    for s in reversed(symbols):
-        if n >= prefix[s]:
-            value = float(n) / prefix[s]
-            return '%.2f%s' % (value, s)
-    return '%.2fB' % (n)
 
 
 def ifconfig():
