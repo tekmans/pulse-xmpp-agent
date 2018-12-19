@@ -129,7 +129,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
             logging.warning("remote updating disable")
         if self.descriptorimage.get_fingerprint_agent_base() != self.Update_Remote_Agentlist.get_fingerprint_agent_base():
             self.agentupdating=True
-            logging.warning("Diff beetween agent is agent image master base")
+            logging.warning("Agent installed is different from agent on master.")
         ###################END Update agent from MAster#############################
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Bind the socket to the port
@@ -1309,7 +1309,8 @@ def doTask( optstypemachine, optsconsoledebug, optsdeamon, tglevellog, tglogfile
                                               tg.Server))
         logging.log(DEBUGPULSE,"verify a information ip or dns for connection AM")
         if ipfromdns(tg.Server) == "" :
-            logging.log(DEBUGPULSE, "not resolution adresse : %s "%tg.Server)
+            logging.log(DEBUGPULSE, "Error while contacting : %s " % tg.Server)
+
         time.sleep(2)
 
     while True:
